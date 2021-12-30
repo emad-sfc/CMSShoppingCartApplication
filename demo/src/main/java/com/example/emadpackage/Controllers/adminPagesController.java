@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.emadpackage.models.data.page;
@@ -33,7 +35,8 @@ public class adminPagesController {
 	@GetMapping
 	public String index(Model model) {
 
-		List<page> pages = pageRepo.findAll();
+//		List<page> pages = pageRepo.findAll();
+		List<page> pages = pageRepo.findAllByOrderBySortingAsc();
 		model.addAttribute("pages", pages);
 		return "admin/pages/index";
 	}
@@ -131,6 +134,23 @@ public class adminPagesController {
 
 		return "redirect:/admin/pages";
 
+	}
+	
+	@PostMapping("/reorder")
+	public @ResponseBody String reorder(@RequestParam("id[]") int[] id) {
+		
+		int count = 1;
+		page page;
+		
+		for (int pageId : id) {
+			page = pageRepo.getById(pageId);
+			page.setSorting(count);
+			pageRepo.save(page);
+			count++;
+		}
+		
+		return "ok";
+		
 	}
 
 }

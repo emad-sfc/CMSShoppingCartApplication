@@ -1,5 +1,7 @@
 package com.example.emadpackage.models.data;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface pageRepository extends JpaRepository<page, Integer>{
@@ -10,5 +12,7 @@ public interface pageRepository extends JpaRepository<page, Integer>{
 //	page findBySlug(int id, String slug);
 	
 	page findBySlugAndIdNot(String slug, int id);
+	
+	List<page> findAllByOrderBySortingAsc();
 	
 }
