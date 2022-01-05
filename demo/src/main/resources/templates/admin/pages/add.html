@@ -1,6 +1,6 @@
-
 <!doctype html>
 <html lang="en">
+
 <head th:replace="/fragments/head"></head>
 
 
@@ -9,12 +9,11 @@
 		<h1 class="display-2">Add a page</h1>
 		<a href="/admin/pages" class="btn btn-primary mb-5">Back to page</a>
 
-		<form method="post" th:object="${page}"
-			th:action="@{/admin/pages/add}">
-			
-			<div th:if="${message}" th:text="${message}" th:class="${'alert ' + alertClass}"></div>		
-				
-					
+		<form method="post" th:object="${page}" th:action="@{/admin/pages/add}">
+
+			<div th:if="${message}" th:text="${message}" th:class="${'alert ' + alertClass}"></div>
+
+
 			<div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
 				There are errors</div>
 			
@@ -42,5 +41,8 @@
 			<button class="btn btn-danger mt-5">Add</button>
 		</form>
 	</div>
+
+	<div th:replace="/fragments/footer"></div>
+	
 </body>
 </html>
