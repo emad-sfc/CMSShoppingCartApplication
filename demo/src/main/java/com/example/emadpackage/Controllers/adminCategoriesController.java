@@ -18,7 +18,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.emadpackage.models.data.category;
 import com.example.emadpackage.models.data.categoryRepository;
-import com.example.emadpackage.models.data.page;
 
 @Controller
 @RequestMapping("/admin/categories")
