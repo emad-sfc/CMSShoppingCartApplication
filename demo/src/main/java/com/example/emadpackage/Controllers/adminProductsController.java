@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,7 +40,17 @@ public class adminProductsController {
 	@GetMapping
 	private String index(Model model) {
 		List<product> products = productRepo.findAll();
+		List<category> categories = categoryRepo.findAll();
+
+		HashMap<Integer, String> cats = new HashMap<>(); // here it is 'cats'
+
+		for (category cat : categories) { // here it is 'cat'
+			cats.put(cat.getId(), cat.getName());
+		}
+
 		model.addAttribute("products", products);
+		model.addAttribute("cats", cats);
+
 		return "admin/products/index";
 	}
 
@@ -48,23 +61,27 @@ public class adminProductsController {
 		return "admin/products/add";
 	}
 
+	// Below binding result should always be next to validation , so spring should
+	// know what validation message to show if input is wrong
 	@PostMapping("/add")
-	public String add(@Valid product product, MultipartFile file, BindingResult bindResult,
+	public String add(@Valid product product, BindingResult bindResult, MultipartFile file,
 			RedirectAttributes redirectAttributes, Model model) throws IOException {
 
+		List<category> categories = categoryRepo.findAll();
+
 		if (bindResult.hasErrors()) {
-			return "admin/categories/add";
+			model.addAttribute("categories", categories);
+			return "admin/products/add";
 		}
-		
+
 		boolean fileOK = false;
 		byte[] bytes = file.getBytes();
 		String fileName = file.getOriginalFilename();
-		Path path = Paths.get("src/main/resources/static/media"+fileName);
-		
-		if(fileName.endsWith("jpg") || fileName.endsWith("png")) {
-			fileOK=true;
+		Path path = Paths.get("src/main/resources/static/media/" + fileName);
+
+		if (fileName.endsWith("jpg") || fileName.endsWith("png")) {
+			fileOK = true;
 		}
-		
 
 		redirectAttributes.addFlashAttribute("message", "Product added");
 		redirectAttributes.addFlashAttribute("alertClass", "alert-success");
@@ -72,26 +89,106 @@ public class adminProductsController {
 		String slug = product.getName().toLowerCase().replace(" ", "-");
 
 		product productExists = productRepo.findBySlug(slug);
-		
-		if(!fileOK) {
+
+		if (!fileOK) {
 			redirectAttributes.addFlashAttribute("message", "Image must be jpg or png");
 			redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
+			redirectAttributes.addFlashAttribute("product", "product");
 		}
-		
-			
 
-		else if(productExists != null) {
+		else if (productExists != null) {
 			redirectAttributes.addFlashAttribute("message", "Product exists, choose another");
 			redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
-			
+			redirectAttributes.addFlashAttribute("product", "product");
+
 		} else {
 			product.setSlug(slug);
 			product.setImage(fileName);
 			productRepo.save(product);
 			Files.write(path, bytes);
-			
-		} 
+
+		}
 
 		return "redirect:/admin/products/add";
+	}
+
+	@GetMapping("/edit/{id}")
+	public String edit(@PathVariable int id, Model model) {
+
+		// page page = pageRepo.getOne(id); //deprecated
+
+		product product = productRepo.getById(id);
+		List<category> categories = categoryRepo.findAll(); // List will come below product, because models are set that
+															// way only.
+
+		model.addAttribute("product", product);
+		model.addAttribute("categories", categories);
+
+		return "admin/products/edit";
+
+	}
+
+	@PostMapping("/edit")
+	public String edit(@Valid product product, BindingResult bindResult, MultipartFile file,
+			RedirectAttributes redirectAttributes, Model model) throws IOException {
+
+		product currentProduct = productRepo.getById(product.getId());
+
+		List<category> categories = categoryRepo.findAll();
+
+		if (bindResult.hasErrors()) {
+			model.addAttribute("productName", currentProduct.getName());
+			model.addAttribute("categories", categories);
+			return "admin/products/edit";
+		}
+
+		boolean fileOK = false;
+		byte[] bytes = file.getBytes();
+		String fileName = file.getOriginalFilename();
+		Path path = Paths.get("src/main/resources/static/media/" + fileName);
+
+		if (!file.isEmpty()) {
+			if (fileName.endsWith("jpg") || fileName.endsWith("png")) {
+				fileOK = true;
+			}
+		} else {
+			fileOK = true;
+		}
+
+		redirectAttributes.addFlashAttribute("message", "Product edited");
+		redirectAttributes.addFlashAttribute("alertClass", "alert-success");
+
+		String slug = product.getName().toLowerCase().replace(" ", "-");
+
+		product productExists = productRepo.findBySlugAndIdNot(slug, product.getId());
+
+		if (!fileOK) {
+			redirectAttributes.addFlashAttribute("message", "Image must be jpg or png");
+			redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
+			redirectAttributes.addFlashAttribute("product", "product");
+		}
+
+		else if (productExists != null) {
+			redirectAttributes.addFlashAttribute("message", "Product exists, choose another");
+			redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
+			redirectAttributes.addFlashAttribute("product", "product");
+
+		} else {
+			product.setSlug(slug);
+
+			if (!file.isEmpty()) {
+				Path path2 = Paths.get("src/main/resources/static/media/" + currentProduct.getImage());
+				Files.delete(path2);
+				product.setImage(fileName);
+				Files.write(path, bytes);
+			} else {
+				product.setImage(currentProduct.getImage());
+			}
+
+			productRepo.save(product);
+
+		}
+
+		return "redirect:/admin/products/edit/" + product.getId();
 	}
 }

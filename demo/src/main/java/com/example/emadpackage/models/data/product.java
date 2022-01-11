@@ -38,7 +38,7 @@ public class product {
 	@Pattern(regexp = "^[0-9]+([.][0-9]{1,2})?", message = "Expected format: 5, 5.99, 15, 15.99")   //to match price format
 	private String price;
 	
-	@Pattern(regexp = "^[1-9][0-9]?", message = "Please chosse a category")	//category range starts from 1. It can't be 0
+	@Pattern(regexp = "^[1-9][0-9]*?", message = "Please chosse a category")	//category range starts from 1. It can't be 0
 	@Column(name = "category_id")			//mapping category_id(of database) with categoryId. 
 	private String categoryId;
 	

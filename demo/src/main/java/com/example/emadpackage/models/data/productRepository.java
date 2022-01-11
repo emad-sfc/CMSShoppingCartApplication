@@ -6,4 +6,6 @@ public interface productRepository extends JpaRepository<product, Integer>{
 
 	product findBySlug(String slug);
 
+	product findBySlugAndIdNot(String slug, int id);
+
 }
