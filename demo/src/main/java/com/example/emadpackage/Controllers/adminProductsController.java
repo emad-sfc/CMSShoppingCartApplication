@@ -11,6 +11,9 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -38,8 +42,15 @@ public class adminProductsController {
 	private categoryRepository categoryRepo;
 
 	@GetMapping
-	private String index(Model model) {
-		List<product> products = productRepo.findAll();
+	private String index(Model model, @RequestParam(value="page",required = false) Integer p) {
+		
+		int perPage = 6;
+		int page = (p!=null)? p : 0;		
+		
+		
+		Pageable pagable = PageRequest.of(page,perPage);
+		
+		Page<product> products = productRepo.findAll(pagable);
 		List<category> categories = categoryRepo.findAll();
 
 		HashMap<Integer, String> cats = new HashMap<>(); // here it is 'cats'
@@ -50,6 +61,14 @@ public class adminProductsController {
 
 		model.addAttribute("products", products);
 		model.addAttribute("cats", cats);
+		
+		Long count = productRepo.count();
+		double pageCount = Math.ceil((double)count/(double)perPage);
+		
+		model.addAttribute("pageCount", (int)pageCount);
+		model.addAttribute("perPage", perPage);
+		model.addAttribute("count", count);
+		model.addAttribute("page", page);
 
 		return "admin/products/index";
 	}
