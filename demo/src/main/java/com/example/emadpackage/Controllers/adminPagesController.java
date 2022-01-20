@@ -41,6 +41,8 @@ public class adminPagesController {
 		return "admin/pages/index";
 	}
 
+	
+
 	@GetMapping("/add")
 	public String add(@ModelAttribute page page) { // Here we are passing object of our page entity
 
