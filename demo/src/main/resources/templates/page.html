@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+
+<head th:replace="/fragments/head"></head>
+
+
+<body>
+
+	<header th:replace="/fragments/nav :: nav-front"> </header>
+
+	<div class="container-fluid mt-5">
+		<div class="row">
+			<div class="col"></div>
+			<div class="col-7" th:utext="${page.content}"></div>   <!--what is utext remove and see what happens-->
+			<div class="col"></div>
+		</div>
+	</div>
+
+	<div th:replace="/fragments/footer"></div>
+</body>
+
+</html>
