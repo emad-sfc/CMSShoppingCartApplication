@@ -30,3 +30,4 @@ function readURL(input, idNum) {
 		reader.readAsDataURL(input.files[0]);
 	}
 }
+
