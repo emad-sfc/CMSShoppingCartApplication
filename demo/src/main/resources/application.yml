@@ -1,0 +1,20 @@
+spring:
+  security:
+    user:
+      name: user
+      password: pass
+      
+#alternate way to write the above code:
+#
+#spring.security.user.name:
+#spring.security.user.password:
+
+#We used below dependency in pom file to use this custom yml .Otherwise it was not reading yml file.
+#
+#    <dependency>
+#      <groupId>org.springframework.boot</groupId>
+#      <artifactId>spring-boot-configuration-processor</artifactId>
+#    </dependency>
+
+#This is alternate to applcation properties.But we can have both.First sPring reads apllication.properties and then application.yml.
+#In this case we are using both.

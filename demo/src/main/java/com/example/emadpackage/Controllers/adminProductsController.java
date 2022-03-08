@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -27,7 +26,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.emadpackage.models.data.category;
 import com.example.emadpackage.models.data.categoryRepository;
-import com.example.emadpackage.models.data.page;
 import com.example.emadpackage.models.data.product;
 import com.example.emadpackage.models.data.productRepository;
 
