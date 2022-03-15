@@ -1,5 +1,6 @@
 package com.example.emadpackage;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -28,10 +29,15 @@ public class common {
 	categoryRepository categoryRepo;
 	
 	@ModelAttribute
-	public void sharedData(Model model, HttpSession session) {      //in this method return type is void! Therefore at the end of this method we are not returning any value.
+	public void sharedData(Model model, HttpSession session, Principal principal) {      //in this method return type is void! Therefore at the end of this method we are not returning any value.
+		
+		if(principal!=null) {
+			model.addAttribute("principal", principal.getName());
+		}
+		
 		List<page> pages = pageRepo.findAllByOrderBySortingAsc();
 		
-		List<category> categories = categoryRepo.findAll();
+		List<category> categories = categoryRepo.findAllByOrderBySortingAsc();
 		
 		boolean cartActive = false;
 		
